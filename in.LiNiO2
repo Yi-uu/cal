@@ -1,0 +1,40 @@
+units          metal
+atom_style     atomic 
+boundary       p p p
+
+read_data      polycrystal-1.lmp
+
+reset_timestep	0
+
+pair_style nep
+pair_coeff * * ./nep89_20250409.txt Li O Ni Al
+
+mass        1  6.94
+mass        2  15.999
+mass        3  58.693 
+mass        4  26.98
+
+neighbor       1.6 bin
+neigh_modify   every 1 delay 5 check yes
+
+minimize 0 1e-6 99999 99999
+
+velocity       all create 300 12345 rot yes mom yes dist gaussian
+timestep   0.002    
+
+thermo_style custom step temp pe etotal press vol lx   
+thermo      1000
+
+variable         S equal step
+variable         T equal temp
+variable         Ep equal pe
+variable         H equal enthalpy
+variable         V equal vol
+
+fix     1 all npt temp 300 300 0.2 aniso 0 0 1
+run             500000
+
+write_data   init-1.data
+
+
+
